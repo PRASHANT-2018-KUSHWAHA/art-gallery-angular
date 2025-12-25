@@ -187,3 +187,28 @@
 html {
   font-size: var(--font-size);
 }
+
+/* Responsive typography: slightly reduce base font-size and headings on smaller screens */
+@media (max-width: 1024px) {
+  :root { --font-size: 13px; }
+  h1 { font-size: 1.9rem; }
+  h2 { font-size: 1.4rem; }
+  h3 { font-size: 1.15rem; }
+}
+
+@media (max-width: 768px) {
+  :root { --font-size: 13px; }
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.35rem; }
+  h3 { font-size: 1.1rem; }
+  p, label, button, input { font-size: 0.95rem; }
+}
+
+@media (max-width: 480px) {
+  :root { --font-size: 12px; }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.2rem; }
+  h3 { font-size: 1rem; }
+  p, label, button, input { font-size: 0.9rem; }
+}
+
