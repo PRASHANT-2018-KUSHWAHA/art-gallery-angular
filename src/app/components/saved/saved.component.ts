@@ -70,16 +70,16 @@ import { Artwork } from '../../models/artwork.model';
             class="saved-card"
             [@fadeInUp]>
             <div class="card-image-container">
-              <img [src]="artwork.image" [alt]="artwork.title" class="card-image">
+              <img [src]="artwork.image || artwork.imageUrl || artwork.thumbnailUrl" [alt]="artwork.title" class="card-image">
               <div class="card-overlay">
                 <button class="view-btn" [routerLink]="['/artwork', artwork.id]">
                   <span class="btn-icon">👁️</span>
                   View Details
                 </button>
-                <button class="quick-view-btn" (click)="openQuickView(artwork)">
+                <!-- <button class="quick-view-btn" (click)="openQuickView(artwork)">
                   <span class="btn-icon">⚡</span>
                   Quick View
-                </button>
+                </button> -->
                 <button class="remove-btn" (click)="removeFromSaved(artwork.id)">
                   <span class="btn-icon">🗑️</span>
                   Remove
