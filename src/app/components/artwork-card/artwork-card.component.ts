@@ -56,7 +56,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
         
         <div class="card-footer">
           <div class="artwork-price" *ngIf="artwork.price">
-            {{ artwork.price | number }}
+            {{ artwork.price | currency:'INR':'symbol':'1.0-0' }}
           </div>
           <div class="card-actions">
             <button class="action-btn primary" (click)="viewDetails()">

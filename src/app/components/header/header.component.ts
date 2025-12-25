@@ -31,18 +31,18 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
              (click)="closeMenu()">
             Artists
           </a>
-          <a routerLink="/exhibitions" 
+          <!-- <a routerLink="/exhibitions" 
              routerLinkActive="active" 
              class="nav-link"
              (click)="closeMenu()">
             Exhibitions
-          </a>
-          <a routerLink="/news" 
+          </a> -->
+          <!-- <a routerLink="/news" 
              routerLinkActive="active" 
              class="nav-link"
              (click)="closeMenu()">
             News
-          </a>
+          </a> -->
           <a routerLink="/about" 
              routerLinkActive="active" 
              class="nav-link"

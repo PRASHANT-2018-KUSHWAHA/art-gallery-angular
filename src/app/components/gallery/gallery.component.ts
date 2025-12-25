@@ -36,13 +36,13 @@ import { GalleryFilterComponent } from '../gallery-filter/gallery-filter.compone
       </section>
 
       <!-- Filter Section -->
-      <section class="filter-section">
+      <!-- <section class="filter-section">
         <app-gallery-filter 
           [categories]="categories"
           [filter]="currentFilter"
           (filterChange)="onFilterChange($event)">
         </app-gallery-filter>
-      </section>
+      </section> -->
 
       <!-- Gallery Grid -->
       <section class="gallery-section" #gallerySection>

@@ -58,7 +58,7 @@ import { Artwork } from '../../models/artwork.model';
               <span class="stats-label">Artworks</span>
             </span>
             <span class="stats-item">
-              <span class="stats-number">{{ totalValue | currency }}</span>
+              <span class="stats-number">{{ totalValue | currency:'INR':'symbol':'1.0-0' }}</span>
               <span class="stats-label">Total Value</span>
             </span>
           </div>
@@ -98,9 +98,9 @@ import { Artwork } from '../../models/artwork.model';
               
               <div class="artwork-meta">
                 <span class="category-tag">{{ artwork?.category?.name || 'N/A' }}</span>
-                <span class="price" *ngIf="artwork.price">{{ artwork.price | number }}</span>
+                <span class="price" *ngIf="artwork.price">{{ artwork.price | currency:'INR':'symbol':'1.0-0' }}</span>
                 <span class="price" *ngIf="!artwork.price">Contact for Price</span>
-              </div>
+              </div> 
               
               <div class="saved-date">
                 <span class="date-icon">📅</span>

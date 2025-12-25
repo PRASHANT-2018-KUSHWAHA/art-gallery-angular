@@ -92,7 +92,7 @@ import { trigger, state, style, transition, animate, query, stagger } from '@ang
           <div class="artwork-purchase" *ngIf="artwork.price">
             <div class="price-section">
               <span class="price-label">Price:</span>
-              <span class="price-value">{{ artwork.price | number }}</span>
+              <span class="price-value">{{ artwork.price | currency:'INR':'symbol':'1.0-0' }}</span>
             </div>
             <div class="purchase-actions">
               <button class="purchase-button primary" (click)="contactArtist()">

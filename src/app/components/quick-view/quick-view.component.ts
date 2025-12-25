@@ -97,7 +97,7 @@ import { Artwork } from '../../models/artwork.model';
             <div class="purchase-section">
               <div class="price-section">
                 <span class="price-label">Price</span>
-                <span class="price-value" *ngIf="artwork.price">{{ artwork.price | number }}</span>
+                <span class="price-value" *ngIf="artwork.price">{{ artwork.price | currency:'INR':'symbol':'1.0-0' }}</span>
                 <span class="price-value" *ngIf="!artwork.price">Contact for Price</span>
               </div>
               
