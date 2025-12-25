@@ -50,23 +50,10 @@ jobs:
           fi
           # Create a 404.html in the build dir that redirects to index.html so client-side routing works
           DIST_DIR="dist/art-gallery"
-          if [[ -d "$DIST_DIR" ]]; then
-            cat > "$DIST_DIR/404.html" <<EOF
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="refresh" content="0;url=${BASEHREF}index.html" />
-    <meta name="robots" content="noindex">
-    <title>Redirecting...</title>
-  </head>
-  <body>
-    <p>Redirecting to <a href="${BASEHREF}index.html">home</a>...</p>
-  </body>
-</html>
-EOF
-          else
-            echo "Build directory not found: $DIST_DIR"
+          mkdir -p "$DIST_DIR"
+          printf '%s\n' '<!doctype html>' '<html>' '  <head>' '    <meta charset="utf-8" />' "    <meta http-equiv=\"refresh\" content=\"0;url=${BASEHREF}index.html\" />" '    <meta name="robots" content="noindex">' '    <title>Redirecting...</title>' '  </head>' '  <body>' "    <p>Redirecting to <a href=\"${BASEHREF}index.html\">home</a>...</p>" '  </body>' '</html>' > "$DIST_DIR/404.html"
+          if [[ ! -f "$DIST_DIR/404.html" ]]; then
+            echo "Failed to create 404.html in: $DIST_DIR"
             exit 1
           fi
 
