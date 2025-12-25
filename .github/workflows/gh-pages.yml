@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -56,6 +58,17 @@ jobs:
             echo "Failed to create 404.html in: $DIST_DIR"
             exit 1
           fi
+
+      - name: Prune stale worktrees and show git info
+        run: |
+          set -e
+          echo "Git version: $(git --version)"
+          # Remove stale worktrees and show current list to avoid remove failures later
+          git worktree prune || true
+          git worktree list || true
+          # Show git status/debug info
+          git status --porcelain || true
+          git rev-parse --abbrev-ref HEAD || true
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
