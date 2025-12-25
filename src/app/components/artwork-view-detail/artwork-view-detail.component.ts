@@ -604,7 +604,7 @@ export class ArtworkViewDetailComponent implements OnInit {
 
   viewArtwork(id: string) {
     // Navigate then ensure the page scrolls to top (covers same-component navigation)
-    this.router.navigate(['/artwork', id]).then(() => {
+    this.router.navigate(['/artwork-detail', id]).then(() => {
       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { /* ignore */ }
     });
   }

@@ -693,6 +693,6 @@ export class ArtworkDetailComponent implements OnInit, OnDestroy {
 
   viewArtwork(id: string): void {
     // Navigate to the artwork detail page
-    window.location.href = `/artwork/${id}`;
+    window.location.href = `/artwork-detail/${id}`;
   }
 }
