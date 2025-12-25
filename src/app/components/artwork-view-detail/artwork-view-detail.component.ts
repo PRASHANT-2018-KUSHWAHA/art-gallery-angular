@@ -24,7 +24,7 @@ import { Artwork } from '../../models/artwork.model';
         <!-- Image Section -->
         <div class="image-section">
           <div class="main-image-container">
-            <img [src]="currentImage || artwork.image || artwork.imageUrl" [alt]="artwork.title" class="main-image">
+            <img [src]="currentImage || artwork.image || artwork.imageUrl" [alt]="artwork.title" class="main-image" loading="lazy" decoding="async" (error)="onImgError($event)">
             <div class="image-overlay">
               <button class="zoom-btn" (click)="openZoom()">
                 <span class="zoom-icon">🔍</span>
@@ -44,13 +44,13 @@ import { Artwork } from '../../models/artwork.model';
               class="thumbnail"
               [class.active]="i === selectedImageIndex"
               (click)="selectImage(i)">
-              <img [src]="image" [alt]="artwork.title + ' ' + (i + 1)">
+              <img [src]="image" [alt]="artwork.title + ' ' + (i + 1)" loading="lazy" decoding="async" (error)="onImgError($event)">
             </div>
           </div>
           <!-- Fallback for single image -->
           <div class="thumbnail-gallery" *ngIf="!artwork.images || artwork.images.length <= 1">
             <div class="thumbnail active">
-              <img [src]="artwork.image || artwork.imageUrl" [alt]="artwork.title">
+              <img [src]="artwork.image || artwork.imageUrl" [alt]="artwork.title" loading="lazy" decoding="async" (error)="onImgError($event)">
             </div>
           </div>
         </div>
@@ -125,7 +125,7 @@ import { Artwork } from '../../models/artwork.model';
             *ngFor="let relatedArtwork of relatedArtworks"
             class="related-card"
             (click)="viewArtwork(relatedArtwork.id)">
-            <img [src]="relatedArtwork.image || relatedArtwork.imageUrl" [alt]="relatedArtwork.title" class="related-image">
+            <img [src]="relatedArtwork.image || relatedArtwork.imageUrl" [alt]="relatedArtwork.title" class="related-image" loading="lazy" decoding="async" (error)="onImgError($event)">
             <div class="related-info">
               <h4 class="related-title">{{ relatedArtwork.title }}</h4>
               <p class="related-artist">{{ relatedArtwork.artist }}</p>
@@ -142,19 +142,21 @@ import { Artwork } from '../../models/artwork.model';
     </div>
   `,
   styles: [`
+    /* Container */
     .artwork-detail-container {
       min-height: 100vh;
       padding: 2rem;
       max-width: 1400px;
       margin: 0 auto;
     }
-    
+
+    /* Back */
     .back-section {
       margin-bottom: 2rem;
     }
-    
+
     .back-btn {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 0.5rem;
       background: none;
@@ -166,28 +168,36 @@ import { Artwork } from '../../models/artwork.model';
       font-weight: 600;
       color: #374151;
     }
-    
+
     .back-btn:hover {
       border-color: #6366f1;
       color: #6366f1;
     }
-    
+
     .back-icon {
       font-size: 1.2rem;
     }
-    
+
+    /* Layout */
     .detail-content {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 420px;
       gap: 4rem;
       margin-bottom: 4rem;
     }
-    
+
+    /* Image */
     .image-section {
-      position: sticky;
-      top: 2rem;
+      /* sticky only on large screens */
     }
-    
+
+    @media (min-width: 1024px) {
+      .image-section {
+        position: sticky;
+        top: 2rem;
+      }
+    }
+
     .main-image-container {
       position: relative;
       margin-bottom: 1rem;
@@ -195,18 +205,37 @@ import { Artwork } from '../../models/artwork.model';
       overflow: hidden;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     }
-    
+
     .main-image {
       width: 100%;
       height: 500px;
+      min-height: 140px;
+      background: #f3f4f6;
       object-fit: cover;
       transition: transform 0.3s ease;
+      display: block;
     }
-    
-    .main-image-container:hover .main-image {
-      transform: scale(1.02);
+
+    .img-broken {
+      filter: grayscale(80%);
+      opacity: 0.85;
+      object-fit: contain !important;
     }
-    
+
+    /* Tweak heights for intermediate sizes */
+    @media (max-width: 1200px) {
+      .main-image { height: 420px; }
+    }
+    @media (max-width: 992px) {
+      .main-image { height: 360px; }
+    }
+    @media (max-width: 768px) {
+      .main-image { height: auto; max-height: 60vh; object-fit: contain; }
+      .image-section { position: static; }
+    }
+
+    .main-image-container:hover .main-image { transform: scale(1.02); }
+
     .image-overlay {
       position: absolute;
       top: 1rem;
@@ -216,11 +245,9 @@ import { Artwork } from '../../models/artwork.model';
       opacity: 0;
       transition: opacity 0.3s ease;
     }
-    
-    .main-image-container:hover .image-overlay {
-      opacity: 1;
-    }
-    
+
+    .main-image-container:hover .image-overlay { opacity: 1; }
+
     .zoom-btn, .save-btn {
       background: rgba(255, 255, 255, 0.9);
       border: none;
@@ -233,171 +260,99 @@ import { Artwork } from '../../models/artwork.model';
       gap: 0.25rem;
       transition: all 0.3s ease;
     }
-    
-    .zoom-btn:hover, .save-btn:hover {
-      background: white;
-      transform: translateY(-2px);
-    }
-    
-    .save-btn.saved {
-      background: #ef4444;
-      color: white;
-    }
-    
+
+    .zoom-btn:hover, .save-btn:hover { background: white; transform: translateY(-2px); }
+    .save-btn.saved { background: #ef4444; color: white; }
+
+    /* Thumbnails */
     .thumbnail-gallery {
       display: flex;
       gap: 0.5rem;
       overflow-x: auto;
       padding: 0.5rem 0;
     }
-    
-    .thumbnail {
-      flex-shrink: 0;
-      width: 80px;
-      height: 80px;
-      border-radius: 8px;
-      overflow: hidden;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: all 0.3s ease;
+
+    .thumbnail { flex-shrink: 0; width: 80px; height: 80px; border-radius: 8px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: all 0.3s ease; }
+    .thumbnail:hover, .thumbnail.active { border-color: #6366f1; }
+    .thumbnail img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* Info */
+    .info-section { padding: 1rem 0; }
+    .artwork-header { margin-bottom: 2rem; }
+
+    .artwork-title { font-size: 2.5rem; font-weight: 700; color: #1a202c; margin-bottom: 1rem; line-height: 1.2; }
+    .artwork-meta { display: flex; gap: 2rem; color: #6b7280; font-size: 1.1rem; }
+    .artist-name { font-weight: 600; color: #6366f1; }
+
+    .artwork-details { background: #f8fafc; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; }
+    .detail-row { display: flex; justify-content: space-between; margin-bottom: 0.75rem; }
+    .detail-row:last-child { margin-bottom: 0; }
+    .detail-label { font-weight: 600; color: #374151; } .detail-value { color: #6b7280; }
+
+    .artwork-description { margin-bottom: 2rem; }
+    .artwork-description h3 { font-size: 1.25rem; font-weight: 700; color: #1a202c; margin-bottom: 1rem; }
+    .artwork-description p { color: #4a5568; line-height: 1.6; }
+
+    .artwork-tags { margin-bottom: 2rem; }
+    .artwork-tags h3 { font-size: 1.25rem; font-weight: 700; color: #1a202c; margin-bottom: 1rem; }
+    .tags-container { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tag { background: #e5e7eb; color: #374151; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.9rem; font-weight: 500; }
+
+    .purchase-section { background: white; border: 2px solid #e5e7eb; padding: 2rem; border-radius: 12px; }
+    .price-section { margin-bottom: 1.5rem; text-align: center; }
+    .price-label { display: block; font-size: 0.9rem; color: #6b7280; margin-bottom: 0.5rem; }
+    .price-value { font-size: 2rem; font-weight: 700; color: #1a202c; }
+
+    .action-buttons { display: flex; gap: 1rem; }
+
+    .contact-btn, .share-btn { flex: 1; padding: 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+    .contact-btn.primary { background: #6366f1; color: white; border: none; }
+    .contact-btn.primary:hover { background: #4f46e5; transform: translateY(-2px); }
+    .share-btn { background: white; color: #6366f1; border: 2px solid #6366f1; }
+    .share-btn:hover { background: #6366f1; color: white; }
+
+    .related-section { margin-top: 4rem; }
+    .section-title { font-size: 2rem; font-weight: 700; color: #1a202c; margin-bottom: 2rem; text-align: center; }
+
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
+    .related-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .related-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); }
+    .related-image { width: 100%; height: 200px; object-fit: cover; }
+    .related-info { padding: 1rem; }
+    .related-title { font-size: 1.1rem; font-weight: 600; color: #1a202c; margin-bottom: 0.5rem; }
+    .related-artist { color: #6b7280; font-size: 0.9rem; }
+
+    .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; gap: 1rem; }
+    .loading-spinner { width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top: 4px solid #6366f1; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      .detail-content { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+      .main-image { height: 420px; }
+      .thumbnail { width: 64px; height: 64px; }
     }
-    
-    .thumbnail:hover, .thumbnail.active {
-      border-color: #6366f1;
+
+    @media (max-width: 768px) {
+      .artwork-detail-container { padding: 1rem; }
+      .detail-content { grid-template-columns: 1fr; gap: 2rem; }
+      .artwork-title { font-size: 2rem; }
+      .action-buttons { flex-direction: column; }
+      .action-buttons button { width: 100%; }
+      .related-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+      .thumbnail { width: 56px; height: 56px; }
+      .back-btn { width: 100%; justify-content: center; }
+      .related-image { height: 160px; }
     }
-    
-    .thumbnail img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+
+    @media (max-width: 480px) {
+      .main-image { max-height: 55vh; }
+      .artwork-title { font-size: 1.6rem; }
+      .related-image { height: 140px; }
+      .tags-container { gap: 0.35rem; }
+      .tag { font-size: 0.85rem; padding: 0.2rem 0.6rem; }
     }
-    
-    .info-section {
-      padding: 1rem 0;
-    }
-    
-    .artwork-header {
-      margin-bottom: 2rem;
-    }
-    
-    .artwork-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: #1a202c;
-      margin-bottom: 1rem;
-      line-height: 1.2;
-    }
-    
-    .artwork-meta {
-      display: flex;
-      gap: 2rem;
-      color: #6b7280;
-      font-size: 1.1rem;
-    }
-    
-    .artist-name {
-      font-weight: 600;
-      color: #6366f1;
-    }
-    
-    .artwork-details {
-      background: #f8fafc;
-      padding: 1.5rem;
-      border-radius: 12px;
-      margin-bottom: 2rem;
-    }
-    
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.75rem;
-    }
-    
-    .detail-row:last-child {
-      margin-bottom: 0;
-    }
-    
-    .detail-label {
-      font-weight: 600;
-      color: #374151;
-    }
-    
-    .detail-value {
-      color: #6b7280;
-    }
-    
-    .artwork-description {
-      margin-bottom: 2rem;
-    }
-    
-    .artwork-description h3 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #1a202c;
-      margin-bottom: 1rem;
-    }
-    
-    .artwork-description p {
-      color: #4a5568;
-      line-height: 1.6;
-    }
-    
-    .artwork-tags {
-      margin-bottom: 2rem;
-    }
-    
-    .artwork-tags h3 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #1a202c;
-      margin-bottom: 1rem;
-    }
-    
-    .tags-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-    
-    .tag {
-      background: #e5e7eb;
-      color: #374151;
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
-    
-    .purchase-section {
-      background: white;
-      border: 2px solid #e5e7eb;
-      padding: 2rem;
-      border-radius: 12px;
-    }
-    
-    .price-section {
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
-    
-    .price-label {
-      display: block;
-      font-size: 0.9rem;
-      color: #6b7280;
-      margin-bottom: 0.5rem;
-    }
-    
-    .price-value {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #1a202c;
-    }
-    
-    .action-buttons {
-      display: flex;
-      gap: 1rem;
-    }
-    
+  ,
     .contact-btn, .share-btn {
       flex: 1;
       padding: 1rem;
@@ -545,6 +500,9 @@ export class ArtworkViewDetailComponent implements OnInit {
   isSaved = false;
   currentImage: string = '';
 
+  // Simple inline SVG placeholder for missing images
+  placeholder: string = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='280'><rect width='100%' height='100%' fill='%23f3f4f6'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%236b7280' font-family='Arial' font-size='16'>Image unavailable</text></svg>";
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -567,6 +525,10 @@ export class ArtworkViewDetailComponent implements OnInit {
         this.currentImage = this.artwork.image || this.artwork.imageUrl;
         this.loadRelatedArtworks();
         this.checkIfSaved();
+        // Ensure new artwork view starts at the top of the page
+        setTimeout(() => {
+          try { window.scrollTo({ top: 0, behavior: 'auto' }); } catch (e) { /* ignore */ }
+        }, 0);
       }
     });
   }
@@ -628,8 +590,23 @@ export class ArtworkViewDetailComponent implements OnInit {
     }
   }
 
+  // Handler for images that fail to load — swap to inline placeholder
+  onImgError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    try {
+      if (!img || img.src.startsWith('data:')) { return; }
+      img.src = this.placeholder;
+      img.classList.add('img-broken');
+    } catch (e) {
+      // ignore
+    }
+  }
+
   viewArtwork(id: string) {
-    this.router.navigate(['/artwork', id]);
+    // Navigate then ensure the page scrolls to top (covers same-component navigation)
+    this.router.navigate(['/artwork', id]).then(() => {
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { /* ignore */ }
+    });
   }
 
   goBack() {
