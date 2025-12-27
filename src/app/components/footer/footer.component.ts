@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   template: `
     <footer class="footer">
       <div class="footer-content">
@@ -16,12 +17,13 @@ import { CommonModule } from '@angular/common';
         <div class="footer-section">
           <h4>Quick Links</h4>
           <ul>
-            <li><a href="/">Gallery</a></li>
-            <li><a href="/artists">Artists</a></li>
-            <li><a href="/exhibitions">Exhibitions</a></li>
-            <li><a href="/news">News</a></li>
-            <li><a href="/about">About</a></li>
-            <li><a href="/contact">Contact</a></li>
+            <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="footer-link">Gallery</a></li>
+            <li><a routerLink="/artists" routerLinkActive="active" class="footer-link">Artists</a></li>
+            <!-- <li><a routerLink="/exhibitions" routerLinkActive="active" class="footer-link">Exhibitions</a></li> -->
+            <!-- <li><a routerLink="/news" routerLinkActive="active" class="footer-link">News</a></li> -->
+            <li><a routerLink="/about" routerLinkActive="active" class="footer-link">About</a></li>
+            <li><a routerLink="/contact" routerLinkActive="active" class="footer-link">Contact</a></li>
+            <li><a routerLink="/saved" routerLinkActive="active" class="footer-link"><span class="nav-icon">❤️</span> Saved</a></li>
           </ul>
         </div>
         
@@ -99,6 +101,10 @@ import { CommonModule } from '@angular/common';
     }
     
     .footer-section ul li a:hover {
+      color: #6366f1;
+    }
+
+    .footer-section ul li a.active {
       color: #6366f1;
     }
     
